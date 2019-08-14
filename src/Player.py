@@ -9,20 +9,32 @@ class Player:
         self.height = height
         self.landed = True
         self.speedY = 0
+        self.isRunning = False
     
     def update(self, game):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_RIGHT]:
             if self.canMoveRight(game):
-                self.x += 2
+                if self.isRunning:
+                    self.x += 4
+                else:
+                    self.x += 2
         if keys[pygame.K_LEFT]:
             if self.canMoveLeft(game):
-                self.x -= 2
+                if self.isRunning:
+                    self.x -= 4
+                else:
+                    self.x -= 2
         if keys[pygame.K_SPACE]:
             self.jump()
+        if keys[pygame.K_LSHIFT]:
+            self.isRunning = True
+        else:
+            self.isRunning = False
 
         self.killEnemies(game)
         self.moveY()
+        self.blockJump(game)
         self.land(game)
         self.drop(game)
 
@@ -50,7 +62,7 @@ class Player:
     
     def land(self, game):
         for brick in game.bricks:
-            if brick.x <= self.x + self.width and brick.x + brick.width >= self.x:
+            if brick.x < self.x + self.width and brick.x + brick.width > self.x:
                 if self.y + self.height >= brick.y and self.y + self.height <= brick.y + brick.height and self.speedY < 0:
                     if self.checkAboveBricks(game, brick):
                         self.landed = True
@@ -72,6 +84,8 @@ class Player:
         return True
 
     def canMoveLeft(self, game):
+        if self.x <= 0:
+            return False
         for brick in game.bricks:
             if self.x <= brick.x + brick.width and self.x >= brick.x:
                 if self.y == brick.y or brick.y > self.y and brick.y < self.y + self.height:
@@ -87,7 +101,21 @@ class Player:
                         self.speedY = 15
                         game.enemies.remove(enemy)
                         break
-                    elif self.y + self.height < enemy.y:
+                    elif self.y + self.height < enemy.y or self.y > enemy.y + enemy.height:
                         pass
                     else:
                         self.y = 0
+        
+    def blockJump(self, game):
+        if self.speedY > 0:
+            for brick in game.bricks:
+                if self.x + self.width > brick.x + 5 and self.x < brick.x + brick.width - 5:
+                    if self.y <= brick.y + brick.height and self.y + self.height >= brick.y:
+                        self.speedY = 0
+                        for enemy in game.enemies:
+                            if type(enemy) == BasicEnemy:
+                                if enemy.x <= brick.x + brick.width and enemy.x + enemy.width >= brick.x:
+                                    if enemy.y + enemy.height == brick.y:
+                                        game.enemies.remove(enemy)
+                                        break
+                        return

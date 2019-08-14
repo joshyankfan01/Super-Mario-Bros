@@ -1,6 +1,6 @@
 import pygame
 from Player import Player
-from Brick import Wall, Ground
+from Brick import Wall, Ground, Pipe
 from Enemy import BasicEnemy
 
 init = pygame.init()
@@ -51,6 +51,8 @@ class Game:
                     elif state == '2':
                         self.bricks.append(Ground(j * 50, i * 50))
                     elif state == '3':
+                        self.bricks.append(Pipe(j * 50, i * 50))
+                    elif state == '4':
                         self.enemies.append(BasicEnemy(j * 50, i * 50))
                     j += 1
                 i += 1

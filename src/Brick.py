@@ -21,12 +21,20 @@ class Wall(Brick):
     
     def update(self, game):
         if super().shouldRender(game):
-            pygame.draw.rect(game.win, (160,82,45), (self.x - game.dx, self.y, self.width, self.height))
+            pygame.draw.rect(game.win, (207, 114, 70), (self.x - game.dx, self.y, self.width, self.height))
     
 class Ground(Brick):
     def __init__(self, x, y):
         super().__init__(x, y)
 
+    def update(self, game):
+        if super().shouldRender(game):
+            pygame.draw.rect(game.win, (160,82,45), (self.x - game.dx, self.y, self.width, self.height))
+
+class Pipe(Brick):
+    def __init__(self, x, y):
+        super().__init__(x, y)
+    
     def update(self, game):
         if super().shouldRender(game):
             pygame.draw.rect(game.win, (0, 255, 0), (self.x - game.dx, self.y, self.width, self.height))
